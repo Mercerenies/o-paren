@@ -1,6 +1,7 @@
 
 open Extlib
 open Sxp
+open Parser
 
 let () =
   let input = read_line ()
