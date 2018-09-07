@@ -15,3 +15,8 @@ let merge a b =
   match a with
   | None   -> b
   | Some _ -> a
+
+let join_option a =
+  match a with
+  | Some (Some x) -> Some x
+  | _ -> None
