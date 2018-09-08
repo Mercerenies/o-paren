@@ -13,12 +13,12 @@ val cons : sexpr -> sexpr -> sexpr
 val to_string : sexpr -> string
 
 module Reader : sig
-  val read_integer : string -> (int * string) option
-  val read_float : string -> (float * string) option
-  val read_string : string -> (string * string) option
-  val read_symbol : string -> (string * string) option
-  val read_list : string -> (sexpr * string) option
-  val read_expr : string -> (sexpr * string) option
+  val integer : int Parser.t
+  val float : float Parser.t
+  val string : string Parser.t
+  val symbol : string Parser.t
+  val list : sexpr Parser.t
+  val expr : sexpr Parser.t
 end
 
 (* val read_string : string -> (sexpr * string) option *)
