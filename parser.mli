@@ -1,38 +1,50 @@
 
-type 'a parser
+type 'a t
 
-val run_parser : 'a parser -> string -> ('a * int) option
+val run_parser : 'a t -> string -> ('a * int) option
 
-val map : ('a -> 'b) -> 'a parser -> 'b parser
+val map : ('a -> 'b) -> 'a t -> 'b t
 
-val pure : 'a -> 'a parser
+val pure : 'a -> 'a t
 
-val empty : 'a parser
+val empty : 'a t
 
-val (>>=) : 'a parser -> ('a -> 'b parser) -> 'b parser
+val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
 
-val (<*>) : ('a -> 'b) parser -> 'a parser -> 'b parser
+val (<*>) : ('a -> 'b) t -> 'a t -> 'b t
 
-val (<@@>) : ('a -> 'b) -> 'a parser -> 'b parser
+val (<@@>) : ('a -> 'b) -> 'a t -> 'b t
 
-val (<|>) : 'a parser -> 'a parser -> 'a parser
+val (<**>) : 'a t -> ('a -> 'b) t -> 'b t
 
-val sequence : 'a parser list -> 'a list parser
+val (<|>) : 'a t -> 'a t -> 'a t
 
-val parse_regexp : Pcre.regexp -> Pcre.substrings parser
+val (<||>) : 'a t -> (unit -> 'a t) -> 'a t
 
-val skip_whitespace : unit parser
+val ( *> ) : 'a t -> 'b t -> 'b t
 
-val satisfy : (char -> bool) -> char parser
+val ( <* ) : 'a t -> 'b t -> 'a t
 
-val char : char -> char parser
+val sequence : 'a t list -> 'a list t
 
-val any_char : char parser
+val regexp : Pcre.regexp -> Pcre.substrings t
 
-val string : string -> string parser
+val skip_whitespace : unit t
 
-val one_of : 'a parser list -> 'a parser
+val satisfy : (char -> bool) -> char t
 
-val some : 'a parser -> 'a list parser
+val char : char -> char t
 
-val many : 'a parser -> 'a list parser
+val not_char : char -> char t
+
+val any_char : char t
+
+val string : string -> string t
+
+val one_of : 'a t list -> 'a t
+
+val some : 'a t -> 'a list t
+
+val many : 'a t -> 'a list t
+
+val optional : 'a t -> 'a option t
