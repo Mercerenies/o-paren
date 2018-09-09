@@ -38,12 +38,12 @@ object (self)
     let (a, b) = scope
     in scope <- (ScopeMap.empty, a :: b)
 
-method pop_scope () =
-  match scope with
-  | (_, []) -> None
-  | (a, y :: ys) ->
-     scope <- (y, ys);
-     Some a
+  method pop_scope () =
+    match scope with
+    | (_, []) -> None
+    | (a, y :: ys) ->
+       scope <- (y, ys);
+       Some a
 
 end
 
