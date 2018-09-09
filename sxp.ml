@@ -60,7 +60,7 @@ module Reader = struct
         (satisfy (function
              | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_') -> true
              | _ -> false))
-    in String.implode <@@> some constituent
+    in String.uppercase <@@> (String.implode <@@> some constituent)
 
   let rec _list () =
     let list_element = skip_whitespace *> _expr () <* skip_whitespace
