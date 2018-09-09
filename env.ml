@@ -3,7 +3,7 @@ module ScopeMap = Map.Make(String)
 
 type 'a scope_frame = 'a Map.Make(String).t
 
-class ['a] env (built_ins : ('a env -> 'a) Map.Make(String).t) =
+class ['a] env (built_ins : ('a env -> 'a -> 'a) Map.Make(String).t) =
 object (self)
   val mutable scope =
     ((ScopeMap.empty, []) : 'a scope_frame * 'a scope_frame list)
@@ -35,6 +35,11 @@ object (self)
          with Not_found -> _get ys
     in let (y, ys) = scope
        in _get (y :: ys)
+
+  method get_built_in s =
+    try
+      Some (ScopeMap.find s built_ins)
+    with Not_found -> None
 
   method push_scope () =
     let (a, b) = scope
