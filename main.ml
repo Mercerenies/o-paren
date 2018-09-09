@@ -3,6 +3,7 @@ open Extlib
 open Sxp
 open Parser
 open Eval
+open Built_ins
 
 let () =
   let input = read_line ()
