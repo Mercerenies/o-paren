@@ -88,10 +88,15 @@ module Reader = struct
         ((fun x -> String x) <@@> string) <|>
         ((fun x -> Symbol x) <@@> symbol)
     end <||>
+      _quoted <||>
       _list
+  and _quoted () =
+    char '\'' *> _expr () >>=
+      fun e -> pure (cons (Symbol "QUOTE") (cons e Nil))
 
   let expr = _expr ()
   let list = _list ()
+  let quoted = _quoted ()
 
 end
 
