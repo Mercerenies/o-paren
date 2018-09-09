@@ -92,3 +92,22 @@ let read_expr str =
 let read_exprs str =
   Option.map_default (fun (x, _) -> x) [] @@
     run_parser (many (skip_whitespace *> Reader.expr)) str
+
+module List = struct
+
+  type 'a expr_list = 'a list * 'a
+
+  let from_list_generic cons (list, dot) =
+    List.fold_right cons list dot
+
+  let from_list = from_list_generic cons
+
+  let rec to_list expr = match expr with
+    | Cons { car; cdr } ->
+       Util.first (fun rest -> car :: rest) (to_list cdr)
+    | x ->
+       ([], x)
+
+  let nil_term x = (x, Nil)
+
+end

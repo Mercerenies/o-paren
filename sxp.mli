@@ -24,4 +24,16 @@ end
 val read_expr : string -> sexpr option
 val read_exprs : string -> sexpr list
 
-(* val read_string : string -> (sexpr * string) option *)
+module List : sig
+
+  type 'a expr_list = 'a list * 'a
+
+  val from_list_generic : ('a -> 'a -> 'a) -> 'a expr_list -> 'a
+
+  val from_list : sexpr expr_list -> sexpr
+
+  val to_list : sexpr -> sexpr expr_list
+
+  val nil_term : sexpr list -> sexpr expr_list
+
+end
