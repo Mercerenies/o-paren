@@ -1,5 +1,6 @@
 
 type cons = { car: sexpr; cdr: sexpr }
+and fun_type = { args: string list; body: sexpr list }
 and sexpr =
   | Nil
   | String of string
@@ -7,10 +8,13 @@ and sexpr =
   | Int of int
   | Float of float
   | Cons of cons
+  | Function of fun_type
 
 type t = sexpr
 
 val cons : sexpr -> sexpr -> sexpr
+
+val make_function : string list -> sexpr list -> sexpr
 
 val to_string : sexpr -> string
 
