@@ -84,3 +84,11 @@ module Reader = struct
   let list = _list ()
 
 end
+
+let read_expr str =
+  Option.map (fun (x, _) -> x) @@
+    run_parser (skip_whitespace *> Reader.expr) str
+
+let read_exprs str =
+  Option.map_default (fun (x, _) -> x) [] @@
+    run_parser (many (skip_whitespace *> Reader.expr)) str

@@ -21,4 +21,7 @@ module Reader : sig
   val expr : sexpr Parser.t
 end
 
+val read_expr : string -> sexpr option
+val read_exprs : string -> sexpr list
+
 (* val read_string : string -> (sexpr * string) option *)
