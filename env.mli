@@ -16,6 +16,8 @@ class ['a] env : ('a env -> 'a -> 'a) Map.Make(String).t -> object
 
   method pop_scope : unit -> 'a scope_frame option
 
+  method in_scope : 'b. (unit -> 'b) -> 'b
+
 end
 
 type 'a t = 'a env

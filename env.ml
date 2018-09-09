@@ -52,6 +52,13 @@ object (self)
        scope <- (y, ys);
        Some a
 
+  method in_scope : 'b. (unit -> 'b) -> 'b =
+    function f ->
+      self#push_scope ();
+      let b = f () in
+      ignore (self#pop_scope ());
+      b
+
 end
 
 type 'a t = 'a env
