@@ -40,6 +40,11 @@ and to_string_cons cons =
 
 module Reader = struct
 
+  let is_symbol_char ch = match ch with
+    | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9') -> true
+    | '_' | '-' | '+' | '*' | '/' -> true
+    | _ -> false
+
   let integer =
     let re = Pcre.regexp "[-+]?[0-9]+"
     in (fun x -> int_of_string (get_substring x 0)) <@@> Parser.regexp re
@@ -57,9 +62,7 @@ module Reader = struct
   let symbol =
     let constituent =
       (char '\\' *> any_char) <|>
-        (satisfy (function
-             | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_') -> true
-             | _ -> false))
+        (satisfy is_symbol_char)
     in String.uppercase <@@> (String.implode <@@> some constituent)
 
   let rec _list () =
