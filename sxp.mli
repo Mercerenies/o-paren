@@ -8,6 +8,8 @@ and sexpr =
   | Float of float
   | Cons of cons
 
+type t = sexpr
+
 val cons : sexpr -> sexpr -> sexpr
 
 val to_string : sexpr -> string

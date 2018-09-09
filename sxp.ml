@@ -14,6 +14,8 @@ and sexpr =
   | Float of float
   | Cons of cons
 
+type t = sexpr
+
 let cons x y = Cons { car = x; cdr = y }
 
 let cons_append xs y = List.fold_right cons xs y
