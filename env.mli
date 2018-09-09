@@ -1,7 +1,7 @@
 
 type 'a scope_frame = 'a Map.Make(String).t
 
-class ['a] env : ('a env -> unit) Map.Make(String).t -> object
+class ['a] env : ('a env -> 'a) Map.Make(String).t -> object
   val scope : 'a scope_frame * 'a scope_frame list
 
   method define_var : string -> 'a -> unit

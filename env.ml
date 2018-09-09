@@ -3,7 +3,7 @@ module ScopeMap = Map.Make(String)
 
 type 'a scope_frame = 'a Map.Make(String).t
 
-class ['a] env (built_ins : ('a env -> unit) Map.Make(String).t) =
+class ['a] env (built_ins : ('a env -> 'a) Map.Make(String).t) =
 object (self)
   val mutable scope =
     ((ScopeMap.empty, []) : 'a scope_frame * 'a scope_frame list)
