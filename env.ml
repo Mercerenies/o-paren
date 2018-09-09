@@ -20,9 +20,11 @@ object (self)
     and _set_go ys = match ys with
       | y :: ys -> _set (y, ys)
       | [] -> (false, [])
-    in let (b, y :: ys) = _set scope in
-       scope <- (y, ys);
-       b
+    in match _set scope with
+       | (_, []) -> failwith "internal error"
+       | (b, y :: ys) ->
+          scope <- (y, ys);
+          b
 
   method get_var s =
     let rec _get ys = match ys with
