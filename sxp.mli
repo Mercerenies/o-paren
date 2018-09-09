@@ -31,7 +31,7 @@ end
 val read_expr : string -> sexpr option
 val read_exprs : string -> sexpr list
 
-module List : sig
+module SList : sig
 
   type 'a expr_list = 'a list * 'a
 

@@ -108,7 +108,7 @@ let read_exprs str =
   Option.map_default (fun (x, _) -> x) [] @@
     run_parser (many (skip_whitespace *> Reader.expr)) str
 
-module List = struct
+module SList = struct
 
   type 'a expr_list = 'a list * 'a
 
