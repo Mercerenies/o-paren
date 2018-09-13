@@ -11,13 +11,9 @@ module ParserMonad : MONAD with type 'a f = 'a t
 
 val empty : 'a t
 
-val (<**>) : 'a t -> ('a -> 'b) t -> 'b t
-
 val (<|>) : 'a t -> 'a t -> 'a t
 
 val (<||>) : 'a t -> (unit -> 'a t) -> 'a t
-
-val sequence : 'a t list -> 'a list t
 
 val regexp : Pcre.regexp -> Pcre.substrings t
 

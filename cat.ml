@@ -39,6 +39,8 @@ module MonadUtils (F : MONAD) = struct
   include MyApplicative
   let return = pure
   let join x = x >>= fun x -> x
+  let sequence x =
+    List.fold_right (fun aa ss -> Util.cons <@@> aa <*> ss) x (pure [])
 end
 
 module ListFunctor = struct

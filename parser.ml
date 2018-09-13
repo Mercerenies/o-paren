@@ -36,16 +36,11 @@ open PMU
 
 let empty = fun _ _ -> None
 
-let (<**>) xx ff = (fun x f -> f x) <@@> xx <*> ff
-
 let (<|>) xx yy = fun s n -> Util.merge (xx s n) (yy s n)
 
 let (<||>) xx y0 = fun s n -> match xx s n with
                               | Some x -> Some x
                               | None -> y0 () s n
-
-let sequence x =
-  List.fold_right (fun aa ss -> Util.cons <@@> aa <*> ss) x (pure [])
 
 let regexp rex = fun s n ->
   try
