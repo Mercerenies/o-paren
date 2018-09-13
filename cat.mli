@@ -6,7 +6,7 @@ end
 
 module type APPLICATIVE = sig
   include FUNCTOR
-  val pure : 'a f
+  val pure : 'a -> 'a f
   val (<*>) : ('a -> 'b) f -> 'a f -> 'b f
 end
 
@@ -27,4 +27,9 @@ module ApplicativeUtils (F : APPLICATIVE) : sig
 end
 
 module MonadUtils (M : MONAD) : sig
+  val return : 'a -> 'a M.f
 end
+
+module ListFunctor : FUNCTOR with type 'a f = 'a list
+module ListApplicative : APPLICATIVE with type 'a f = 'a list
+module ListMonad : MONAD with type 'a f = 'a list

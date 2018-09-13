@@ -6,7 +6,7 @@ end
 
 module type APPLICATIVE = sig
   include FUNCTOR
-  val pure : 'a f
+  val pure : 'a -> 'a f
   val (<*>) : ('a -> 'b) f -> 'a f -> 'b f
 end
 
@@ -32,4 +32,21 @@ module ApplicativeUtils (F : APPLICATIVE) = struct
 end
 
 module MonadUtils (M : MONAD) = struct
+  let return = M.pure
+end
+
+module ListFunctor = struct
+  type 'a f = 'a list
+  let fmap = List.map
+end
+
+module ListApplicative = struct
+  include ListFunctor
+  let pure x = [x]
+  let (<*>) ff xx = List.concat (fmap (fun f -> fmap f xx) ff)
+end
+
+module ListMonad = struct
+  include ListApplicative
+  let (>>=) xx f = List.concat (fmap f xx)
 end
