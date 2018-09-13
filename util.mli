@@ -9,6 +9,4 @@ val safe_get : string -> int -> char option
 
 val merge : 'a option -> 'a option -> 'a option
 
-val join_option : 'a option option -> 'a option
-
 val cons : 'a -> 'a list -> 'a list

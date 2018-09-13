@@ -36,3 +36,7 @@ end
 module ListFunctor : FUNCTOR with type 'a f = 'a list
 module ListApplicative : APPLICATIVE with type 'a f = 'a list
 module ListMonad : MONAD with type 'a f = 'a list
+
+module OptionFunctor : FUNCTOR with type 'a f = 'a option
+module OptionApplicative : APPLICATIVE with type 'a f = 'a option
+module OptionMonad : MONAD with type 'a f = 'a option

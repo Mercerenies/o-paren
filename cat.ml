@@ -1,4 +1,6 @@
 
+open Extlib
+
 module type FUNCTOR = sig
   type 'a f
   val fmap : ('a -> 'b) -> 'a f -> 'b f
@@ -53,4 +55,24 @@ end
 module ListMonad = struct
   include ListApplicative
   let (>>=) xx f = List.concat (fmap f xx)
+end
+
+module OptionFunctor = struct
+  type 'a f = 'a option
+  let fmap = Option.map
+end
+
+module OptionApplicative = struct
+  include OptionFunctor
+  let pure x = Some x
+  let (<*>) ff xx = match ff with
+    | None -> None
+    | Some f -> fmap f xx
+end
+
+module OptionMonad = struct
+  include OptionApplicative
+  let (>>=) xx f = match xx with
+    | None -> None
+    | Some x -> f x
 end

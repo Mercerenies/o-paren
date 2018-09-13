@@ -24,9 +24,10 @@ end
 
 module ParserMonad = struct
   include ParserApplicative
+  module OMU = Cat.MonadUtils(Cat.OptionMonad)
   let (>>=) gg f = fun s n ->
     let inner (x, n1) = f x s n1
-    in Util.join_option (Option.map inner (gg s n))
+    in OMU.join (Option.map inner (gg s n))
 end
 
 open ParserMonad

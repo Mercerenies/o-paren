@@ -16,9 +16,4 @@ let merge a b =
   | None   -> b
   | Some _ -> a
 
-let join_option a =
-  match a with
-  | Some (Some x) -> Some x
-  | _ -> None
-
 let cons a b = a :: b
