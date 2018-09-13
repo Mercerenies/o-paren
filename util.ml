@@ -11,9 +11,4 @@ let safe_get str n =
     Some (String.get str n)
   with Invalid_argument _ -> None
 
-let merge a b =
-  match a with
-  | None   -> b
-  | Some _ -> a
-
 let cons a b = a :: b

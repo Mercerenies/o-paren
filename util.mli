@@ -7,6 +7,4 @@ val second : ('a -> 'b) -> ('c * 'a) -> ('c * 'b)
 
 val safe_get : string -> int -> char option
 
-val merge : 'a option -> 'a option -> 'a option
-
 val cons : 'a -> 'a list -> 'a list
