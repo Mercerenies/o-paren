@@ -30,13 +30,16 @@ module ParserMonad = struct
     in OMU.join (Option.map inner (gg s n))
 end
 
+module ParserAlternative = struct
+  include ParserApplicative
+  let empty = fun _ _ -> None
+  let (<|>) xx yy = fun s n -> Util.merge (xx s n) (yy s n)
+end
+
 open ParserMonad
+open ParserAlternative
 module PMU = MonadUtils(ParserMonad)
 open PMU
-
-let empty = fun _ _ -> None
-
-let (<|>) xx yy = fun s n -> Util.merge (xx s n) (yy s n)
 
 let (<||>) xx y0 = fun s n -> match xx s n with
                               | Some x -> Some x

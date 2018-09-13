@@ -15,6 +15,12 @@ module type MONAD = sig
   val (>>=) : 'a f -> ('a -> 'b f) -> 'b f
 end
 
+module type ALTERNATIVE = sig
+  include APPLICATIVE
+  val empty : 'a f
+  val (<|>) : 'a f -> 'a f -> 'a f
+end
+
 module FunctorUtils (F : FUNCTOR) : sig
   val map : ('a -> 'b) -> 'a F.f -> 'b F.f
   val (<@@>) : ('a -> 'b) -> 'a F.f -> 'b F.f
@@ -34,10 +40,16 @@ module MonadUtils (F : MONAD) : sig
   val sequence : 'a F.f list -> 'a list F.f
 end
 
+module AlternativeUtils (F : ALTERNATIVE) : sig
+  include module type of struct include ApplicativeUtils(F) end
+end
+
 module ListFunctor : FUNCTOR with type 'a f = 'a list
 module ListApplicative : APPLICATIVE with type 'a f = 'a list
 module ListMonad : MONAD with type 'a f = 'a list
+module ListAlternative : ALTERNATIVE with type 'a f = 'a list
 
 module OptionFunctor : FUNCTOR with type 'a f = 'a option
 module OptionApplicative : APPLICATIVE with type 'a f = 'a option
 module OptionMonad : MONAD with type 'a f = 'a option
+module OptionAlternative : ALTERNATIVE with type 'a f = 'a option

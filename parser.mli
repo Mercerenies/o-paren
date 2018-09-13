@@ -8,10 +8,7 @@ val run_parser : 'a t -> string -> ('a * int) option
 module ParserFunctor : FUNCTOR with type 'a f = 'a t
 module ParserApplicative : APPLICATIVE with type 'a f = 'a t
 module ParserMonad : MONAD with type 'a f = 'a t
-
-val empty : 'a t
-
-val (<|>) : 'a t -> 'a t -> 'a t
+module ParserAlternative : ALTERNATIVE with type 'a f = 'a t
 
 val (<||>) : 'a t -> (unit -> 'a t) -> 'a t
 

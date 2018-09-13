@@ -40,6 +40,7 @@ and to_string_cons cons =
 
 module Reader = struct
 
+  open ParserAlternative
   open ParserMonad
   module PMU = Cat.MonadUtils(ParserMonad)
   open PMU

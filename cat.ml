@@ -17,6 +17,12 @@ module type MONAD = sig
   val (>>=) : 'a f -> ('a -> 'b f) -> 'b f
 end
 
+module type ALTERNATIVE = sig
+  include APPLICATIVE
+  val empty : 'a f
+  val (<|>) : 'a f -> 'a f -> 'a f
+end
+
 module FunctorUtils (F : FUNCTOR) = struct
   open F
   type 'a f = 'a F.f
@@ -43,6 +49,11 @@ module MonadUtils (F : MONAD) = struct
     List.fold_right (fun aa ss -> Util.cons <@@> aa <*> ss) x (pure [])
 end
 
+module AlternativeUtils (F : ALTERNATIVE) = struct
+  module MyApplicative = ApplicativeUtils(F)
+  include MyApplicative
+end
+
 module ListFunctor = struct
   type 'a f = 'a list
   let fmap = List.map
@@ -57,6 +68,12 @@ end
 module ListMonad = struct
   include ListApplicative
   let (>>=) xx f = List.concat (fmap f xx)
+end
+
+module ListAlternative = struct
+  include ListApplicative
+  let empty = []
+  let (<|>) = List.append
 end
 
 module OptionFunctor = struct
@@ -77,4 +94,12 @@ module OptionMonad = struct
   let (>>=) xx f = match xx with
     | None -> None
     | Some x -> f x
+end
+
+module OptionAlternative = struct
+  include OptionApplicative
+  let empty = None
+  let (<|>) x y = match x with
+    | None -> y
+    | _    -> x
 end
