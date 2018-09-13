@@ -25,14 +25,16 @@ end
 module ApplicativeUtils (F : APPLICATIVE) = struct
   open F
   module MyFunctor = FunctorUtils(F)
-  open MyFunctor
+  include MyFunctor
   let ( <* ) a b = (fun a _ -> a) <@@> a <*> b
   let ( *> ) a b = (fun _ b -> b) <@@> a <*> b
   let (<**>) a f = (fun a f -> f a) <@@> a <*> f
 end
 
-module MonadUtils (M : MONAD) = struct
-  let return = M.pure
+module MonadUtils (F : MONAD) = struct
+  module MyApplicative = ApplicativeUtils(F)
+  include MyApplicative
+  let return = F.pure
 end
 
 module ListFunctor = struct

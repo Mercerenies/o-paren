@@ -21,13 +21,15 @@ module FunctorUtils (F : FUNCTOR) : sig
 end
 
 module ApplicativeUtils (F : APPLICATIVE) : sig
+  include module type of struct include FunctorUtils(F) end
   val ( <* ) : 'a F.f -> 'b F.f -> 'a F.f
   val ( *> ) : 'a F.f -> 'b F.f -> 'b F.f
   val (<**>) : 'a F.f -> ('a -> 'b) F.f -> 'b F.f
 end
 
-module MonadUtils (M : MONAD) : sig
-  val return : 'a -> 'a M.f
+module MonadUtils (F : MONAD) : sig
+  include module type of struct include ApplicativeUtils(F) end
+  val return : 'a -> 'a F.f
 end
 
 module ListFunctor : FUNCTOR with type 'a f = 'a list

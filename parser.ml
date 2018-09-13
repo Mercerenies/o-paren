@@ -2,24 +2,38 @@
 open Extlib
 open ExtString
 open Pcre
+open Cat
 
 type 'a t = string -> int -> ('a * int) option
 
 let run_parser ff str = ff str 0
 
-let map f gg = fun s n -> Option.map (Util.first f) (gg s n)
+module ParserFunctor = struct
+  type 'a f = 'a t
+  let fmap f gg = fun s n -> Option.map (Util.first f) (gg s n)
+end
 
-let pure x = fun _ n -> Some (x, n)
+module ParserApplicative = struct
+  include ParserFunctor
+  let pure x = fun _ n -> Some (x, n)
+  let (<*>) ff xx = fun s n ->
+    match ff s n with
+    | None -> None
+    | Some (f, n1) -> Option.map (Util.first f) (xx s n1)
+end
+
+module ParserMonad = struct
+  include ParserApplicative
+  let (>>=) gg f = fun s n ->
+    let inner (x, n1) = f x s n1
+    in Util.join_option (Option.map inner (gg s n))
+end
+
+open ParserMonad
+module ParserMonadUtils = MonadUtils(ParserMonad)
+open ParserMonadUtils
 
 let empty = fun _ _ -> None
-
-let (>>=) gg f = fun s n ->
-  let inner (x, n1) = f x s n1
-  in Util.join_option (Option.map inner (gg s n))
-
-let (<*>) ff xx = ff >>= fun (f) -> xx >>= fun (x) -> pure (f x)
-
-let (<@@>) = map
 
 let (<**>) xx ff = (fun x f -> f x) <@@> xx <*> ff
 
@@ -28,10 +42,6 @@ let (<|>) xx yy = fun s n -> Util.merge (xx s n) (yy s n)
 let (<||>) xx y0 = fun s n -> match xx s n with
                               | Some x -> Some x
                               | None -> y0 () s n
-
-let ( *> ) xx yy = (fun _ y -> y) <@@> xx <*> yy
-
-let ( <* ) xx yy = (fun x _ -> x) <@@> xx <*> yy
 
 let sequence x =
   List.fold_right (fun aa ss -> Util.cons <@@> aa <*> ss) x (pure [])

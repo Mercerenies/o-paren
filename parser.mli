@@ -1,29 +1,21 @@
 
+open Cat
+
 type 'a t
 
 val run_parser : 'a t -> string -> ('a * int) option
 
-val map : ('a -> 'b) -> 'a t -> 'b t
-
-val pure : 'a -> 'a t
+module ParserFunctor : FUNCTOR with type 'a f = 'a t
+module ParserApplicative : APPLICATIVE with type 'a f = 'a t
+module ParserMonad : MONAD with type 'a f = 'a t
 
 val empty : 'a t
-
-val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
-
-val (<*>) : ('a -> 'b) t -> 'a t -> 'b t
-
-val (<@@>) : ('a -> 'b) -> 'a t -> 'b t
 
 val (<**>) : 'a t -> ('a -> 'b) t -> 'b t
 
 val (<|>) : 'a t -> 'a t -> 'a t
 
 val (<||>) : 'a t -> (unit -> 'a t) -> 'a t
-
-val ( *> ) : 'a t -> 'b t -> 'b t
-
-val ( <* ) : 'a t -> 'b t -> 'a t
 
 val sequence : 'a t list -> 'a list t
 

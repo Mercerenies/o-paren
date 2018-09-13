@@ -40,6 +40,10 @@ and to_string_cons cons =
 
 module Reader = struct
 
+  open ParserMonad
+  module ParserMonadUtils = Cat.MonadUtils(ParserMonad)
+  open ParserMonadUtils
+
   let is_symbol_char ch = match ch with
     | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9') -> true
     | '_' | '-' | '+' | '*' | '/' -> true
@@ -101,12 +105,16 @@ module Reader = struct
 end
 
 let read_expr str =
-  Option.map (fun (x, _) -> x) @@
-    run_parser (skip_whitespace *> Reader.expr) str
+  let module PMU = Cat.MonadUtils(ParserMonad)
+  in let open PMU in
+     Option.map (fun (x, _) -> x) @@
+       run_parser (skip_whitespace *> Reader.expr) str
 
 let read_exprs str =
-  Option.map_default (fun (x, _) -> x) [] @@
-    run_parser (many (skip_whitespace *> Reader.expr)) str
+  let module PMU = Cat.MonadUtils(ParserMonad)
+  in let open PMU in
+     Option.map_default (fun (x, _) -> x) [] @@
+       run_parser (many (skip_whitespace *> Reader.expr)) str
 
 module SList = struct
 
