@@ -4,6 +4,7 @@ open Sxp
 open Parser
 open Eval
 open Built_ins
+open Cat
 
 let () =
   let input = read_line ()
