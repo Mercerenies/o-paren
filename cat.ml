@@ -32,9 +32,11 @@ module ApplicativeUtils (F : APPLICATIVE) = struct
 end
 
 module MonadUtils (F : MONAD) = struct
+  open F
   module MyApplicative = ApplicativeUtils(F)
   include MyApplicative
-  let return = F.pure
+  let return = pure
+  let join x = x >>= fun x -> x
 end
 
 module ListFunctor = struct

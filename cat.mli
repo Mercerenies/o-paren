@@ -30,6 +30,7 @@ end
 module MonadUtils (F : MONAD) : sig
   include module type of struct include ApplicativeUtils(F) end
   val return : 'a -> 'a F.f
+  val join : 'a F.f F.f -> 'a F.f
 end
 
 module ListFunctor : FUNCTOR with type 'a f = 'a list
