@@ -41,8 +41,8 @@ and to_string_cons cons =
 module Reader = struct
 
   open ParserMonad
-  module ParserMonadUtils = Cat.MonadUtils(ParserMonad)
-  open ParserMonadUtils
+  module PMU = Cat.MonadUtils(ParserMonad)
+  open PMU
 
   let is_symbol_char ch = match ch with
     | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9') -> true

@@ -31,8 +31,8 @@ module ParserMonad = struct
 end
 
 open ParserMonad
-module ParserMonadUtils = MonadUtils(ParserMonad)
-open ParserMonadUtils
+module PMU = MonadUtils(ParserMonad)
+open PMU
 
 let empty = fun _ _ -> None
 
