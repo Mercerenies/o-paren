@@ -21,7 +21,7 @@ and _eval_acc env exprs tail =
   in List.fold_left f (pure tail) exprs
 and eval_seq env exprs = List.hd <@@> _eval_acc env exprs [Nil]
 and eval_list env args = List.rev <@@> _eval_acc env args []
-and eval (env : Sxp.t Env.t) expr =
+and eval env expr =
   let rec function_call f xs = match xs with
     | (xs, Nil) ->
        eval env f >>= (fun f ->
@@ -31,7 +31,15 @@ and eval (env : Sxp.t Env.t) expr =
             call_function env f args)
         | _ -> Error "not a function")
     | _ -> Error "malformed function call"
+  and builtin_call f xs = match xs with
+    | (xs, Nil) -> f env xs
+    | _ -> Error "malformed built-in call"
   in match expr with
      | Symbol s -> lookup_name env s
+     | Cons { car=(Symbol s as car); cdr } -> begin
+         match env#get_built_in s with
+         | Some value -> builtin_call value (SList.to_list cdr)
+         | None -> function_call car (SList.to_list cdr)
+       end
      | Cons { car; cdr } -> function_call car (SList.to_list cdr)
      | x -> Success x
