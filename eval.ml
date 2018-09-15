@@ -44,37 +44,22 @@ let rec call_function env fn args =
     List.iter2 env#define_var parms args;
     eval_seq env body
   with Invalid_argument _ -> Error "wrong number of arguments"
-and eval_seq env exprs = match exprs with
-  | [] -> Success Nil
-  | e :: [] -> eval env e
-  | e :: es -> match eval env e with
-               | Success _ -> eval_seq env es
-               | Error x -> Error x
+and _eval_acc env exprs tail =
+  let f acc x = acc >>= fun xs -> fmap (fun x -> x :: xs) (eval env x)
+  in List.fold_left f (pure tail) exprs
+and eval_seq env exprs = List.hd <@@> _eval_acc env exprs [Nil]
+and eval_list env args = List.rev <@@> _eval_acc env args []
 and eval (env : Sxp.t Env.t) expr =
-  let rec _eval_args args0 = match args0 with
-    | [] -> Success []
-    | (y :: ys) -> match eval env y with
-                   | Error e -> Error e
-                   | Success z ->
-                      match _eval_args ys with
-                      | Error e -> Error e
-                      | Success zs -> Success (z :: zs)
-  and function_call x = match x with
-    | (y :: ys, Nil) -> begin
-        match eval env y with
-        | Success f -> begin
-            match _eval_args ys with
-            | Success args -> begin
-                match f with
-                | Function f -> call_function env f args
-                | _ -> Error "not a function"
-              end
-            | Error e -> Error e
-          end
-        | Error e -> Error e
-      end
+  let rec function_call f xs = match xs with
+    | (xs, Nil) ->
+       eval env f >>= (fun f ->
+        match f with
+        | Function f ->
+           eval_list env xs >>= (fun args ->
+            call_function env f args)
+        | _ -> Error "not a function")
     | _ -> Error "malformed function call"
   in match expr with
      | Symbol s -> lookup_name env s
-     | Cons _ -> function_call (SList.to_list expr)
+     | Cons { car; cdr } -> function_call car (SList.to_list cdr)
      | x -> Success x

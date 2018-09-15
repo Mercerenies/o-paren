@@ -1,7 +1,7 @@
 
 type 'a scope_frame = 'a Map.Make(String).t
 
-class ['a] env : ('a env -> 'a -> 'a) Map.Make(String).t -> object
+class ['a] env : ('a env -> 'a list -> 'a) Map.Make(String).t -> object
 
   method define_var : string -> 'a -> unit
 
@@ -10,7 +10,7 @@ class ['a] env : ('a env -> 'a -> 'a) Map.Make(String).t -> object
 
   method get_var : string -> 'a option
 
-  method get_built_in : string -> ('a env -> 'a -> 'a) option
+  method get_built_in : string -> ('a env -> 'a list -> 'a) option
 
   method push_scope : unit -> unit
 
@@ -19,5 +19,7 @@ class ['a] env : ('a env -> 'a -> 'a) Map.Make(String).t -> object
   method in_scope : 'b. (unit -> 'b) -> 'b
 
 end
+
+type 'a builtin = 'a env -> 'a list -> 'a
 
 type 'a t = 'a env
