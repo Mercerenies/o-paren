@@ -6,7 +6,7 @@ open Pcre
 open Parser
 
 type cons = { car: sexpr; cdr: sexpr }
-and fun_type = { args: string list; body: sexpr list }
+and fun_type = { parms: string list; body: sexpr list }
 and sexpr =
   | Nil
   | String of string
@@ -22,7 +22,7 @@ let cons x y = Cons { car = x; cdr = y }
 
 let cons_append xs y = List.fold_right cons xs y
 
-let make_function args body = Function { args; body }
+let make_function parms body = Function { parms; body }
 
 let rec to_string x = match x with
   | Nil -> "()"

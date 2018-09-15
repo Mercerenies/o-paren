@@ -28,11 +28,29 @@ module ResultMonad = struct
     | Success x -> f x
 end
 
-let lookup_name (env : Sxp.t Env.t) s =
-  Option.map_default (fun x -> Success x) (Error "no such variable")
-    (env#get_var s)
+open ResultMonad
+module RMU = Cat.MonadUtils(ResultMonad)
+open RMU
 
-let rec eval (env : Sxp.t Env.t) expr =
+let result_of_option s =
+  Option.map_default (fun x -> Success x) (Error s)
+
+let lookup_name env s =
+  result_of_option "no such variable" (env#get_var s)
+
+let rec call_function env fn args =
+  let { parms ; body } = fn
+  in try
+    List.iter2 env#define_var parms args;
+    eval_seq env body
+  with Invalid_argument _ -> Error "wrong number of arguments"
+and eval_seq env exprs = match exprs with
+  | [] -> Success Nil
+  | e :: [] -> eval env e
+  | e :: es -> match eval env e with
+               | Success _ -> eval_seq env es
+               | Error x -> Error x
+and eval (env : Sxp.t Env.t) expr =
   let rec _eval_args args0 = match args0 with
     | [] -> Success []
     | (y :: ys) -> match eval env y with
@@ -41,14 +59,6 @@ let rec eval (env : Sxp.t Env.t) expr =
                       match _eval_args ys with
                       | Error e -> Error e
                       | Success zs -> Success (z :: zs)
-  and perform_call { args = parms ; body = body } args =
-    env#in_scope begin
-        fun () ->
-        try
-          List.iter2 env#define_var parms args;
-          _eval_body body
-        with Invalid_argument _ -> Error "wrong number of arguments"
-      end
   and function_call x = match x with
     | (y :: ys, Nil) -> begin
         match eval env y with
@@ -56,7 +66,7 @@ let rec eval (env : Sxp.t Env.t) expr =
             match _eval_args ys with
             | Success args -> begin
                 match f with
-                | Function f -> perform_call f args
+                | Function f -> call_function env f args
                 | _ -> Error "not a function"
               end
             | Error e -> Error e
@@ -64,12 +74,6 @@ let rec eval (env : Sxp.t Env.t) expr =
         | Error e -> Error e
       end
     | _ -> Error "malformed function call"
-  and _eval_body exprs = match exprs with
-    | [] -> Success Nil
-    | e :: [] -> eval env e
-    | e :: es -> match eval env e with
-                 | Success _ -> _eval_body es
-                 | Error x -> Error x
   in match expr with
      | Symbol s -> lookup_name env s
      | Cons _ -> function_call (SList.to_list expr)

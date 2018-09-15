@@ -1,6 +1,6 @@
 
 type cons = { car: sexpr; cdr: sexpr }
-and fun_type = { args: string list; body: sexpr list }
+and fun_type = { parms: string list; body: sexpr list }
 and sexpr =
   | Nil
   | String of string
