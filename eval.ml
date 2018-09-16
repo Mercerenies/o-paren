@@ -11,22 +11,20 @@ let lookup_name env s =
   result_of_option "no such variable" (env#get_var s)
 
 let rec bind_args env parms args = match (parms, args) with
-  | (Symbol s, args) ->
+  | (([], Some s), args) ->
      env#define_var s args;
      Success ()
-  | (Cons { car=Symbol pcar; cdr=pcdr }, Cons { car=acar; cdr=acdr }) ->
+  | ((pcar :: pcdr, rest), Cons { car=acar; cdr=acdr }) ->
      env#define_var pcar acar;
-     bind_args env pcdr acdr
-  | (Cons _, Nil) ->
+     bind_args env (pcdr, rest) acdr
+  | ((_ :: _, _), Nil) ->
      Error "not enough arguments"
-  | (Cons _, _) ->
-     Error "malformed argument list"
-  | (Nil, Cons _) ->
+  | (([], None), Cons _) ->
      Error "too many arguments"
-  | (Nil, Nil) ->
+  | (([], None), Nil) ->
      Success ()
-  | _ ->
-     Error "lambda error"
+  | (_, _) ->
+     Error "malformed argument list"
 
 let rec call_function (env : Sxp.t Env.t) fn args =
   let { parms ; body } = fn
