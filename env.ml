@@ -63,6 +63,6 @@ object (self)
 
 end
 
-type 'a builtin = ('a builtin, 'a) env -> 'a list -> 'a eval_result
+type 'a builtin = ('a builtin, 'a) env -> 'a -> 'a eval_result
 
 type 'a t = ('a builtin, 'a) env

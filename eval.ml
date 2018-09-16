@@ -48,14 +48,11 @@ and eval env expr =
          eval_list env xs >>= (fun args ->
           call_function env f args)
       | _ -> Error "not a function")
-  and builtin_call f xs = match xs with
-    | (xs, Nil) -> f env xs
-    | _ -> Error "malformed built-in call"
   in match expr with
      | Symbol s -> lookup_name env s
      | Cons { car=(Symbol s as car); cdr } -> begin
          match env#get_built_in s with
-         | Some value -> builtin_call value (SList.to_list cdr)
+         | Some value -> value env cdr
          | None -> function_call car cdr
        end
      | Cons { car; cdr } -> function_call car cdr
