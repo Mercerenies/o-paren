@@ -28,10 +28,10 @@ let rec bind_args env parms args = match (parms, args) with
   | _ ->
      Error "lambda error"
 
-let rec call_function env fn args =
+let rec call_function (env : Sxp.t Env.t) fn args =
   let { parms ; body } = fn
-  in env#in_scope fun () ->
-       bind_args env parms args >>= fun _ -> eval_seq env body
+  in env#in_scope (fun () ->
+       bind_args env parms args >>= fun _ -> eval_seq env body)
 and _eval_acc env exprs tail =
   let f acc x = acc >>= fun xs -> fmap (fun x -> x :: xs) (eval env x)
   in List.fold_left f (pure tail) exprs
