@@ -4,6 +4,8 @@ open Result
 
 module LocalMap = Map.Make(String)
 
+open ResultMonad
+
 (* (lambda args body ...) *)
 let def_lambda env xs =
   let rec string_of_symbol x = match x with
@@ -32,9 +34,52 @@ let def_quote env xs =
   | ([x], Nil) -> Success x
   | _ -> Error "malformed quote expression"
 
+(* (define var body ...)
+   (define (f args ...) body ...) *)
+let def_define env xs =
+  let go s body =
+    match SList.to_list body with
+    | (body, Nil) ->
+       fmap (fun x -> env#define_var s x; x)
+         (Eval.eval_seq env body)
+    | _ -> Error "malformed define statement"
+  in match xs with
+     | Cons {car=Symbol s; cdr=body} ->
+        go s body
+     | Cons {car=Cons { car=Symbol s; cdr=args }; cdr=body} ->
+        def_lambda env (Cons { car=args; cdr=body }) >>= go s
+     | _ -> Error "malformed define statement"
+
+(* (set a b) *)
+let def_set env xs =
+  match SList.to_list xs with
+  | ([a; b], Nil) ->
+     Eval.eval env a >>= (fun a ->
+      match a with
+      | Symbol s -> Eval.eval env b >>= fun b ->
+                    if env#set_var s b then
+                      pure b
+                    else
+                      Error "no such variable"
+      | _ -> Error "not a symbol")
+  | _ -> Error "malformed set statement"
+
+let def_setq env xs =
+  match SList.to_list xs with
+  | ([Symbol s; b], Nil) ->
+     Eval.eval env b >>= fun b ->
+     if env#set_var s b then
+       pure b
+     else
+       Error "no such variable"
+  | _ -> Error "malformed setq statement"
+
 let built_ins : (string * Sxp.t Env.builtin) list =
   [("LAMBDA", def_lambda);
-   ("QUOTE", def_quote)]
+   ("QUOTE", def_quote);
+   ("DEFINE", def_define);
+   ("SET", def_set);
+   ("SETQ", def_setq)]
 
 let built_in_map =
   let f acc kv = match kv with | (k, v) -> LocalMap.add k v acc
