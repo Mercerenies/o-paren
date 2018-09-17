@@ -1,15 +1,19 @@
 
 open Extlib
-open Sxp
-open Parser
-open Eval
-open Built_ins
-open Cat
+open Result
 
-let () =
+let read = Sxp.read_expr
+let eval = Eval.eval
+let print x = print_endline (Sxp.to_string x)
+
+let rec loop env () =
+  print_string ">> ";
   let input = read_line ()
-  in let read =
-       match Sxp.read_expr input with
-       | None -> "<no read>"
-       | Some x -> to_string x
-     in print_endline read
+  in let () = match read input with
+       | None -> print_endline "<no read>"
+       | Some x -> match eval env x with
+                   | Error e -> print_endline ("<Error: " ^ e ^ ">")
+                   | Success x -> print x
+     in loop env ()
+
+let () = loop (Built_ins.construct_env ()) ()

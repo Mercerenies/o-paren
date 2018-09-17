@@ -15,16 +15,26 @@ let def_lambda env xs =
     | _ -> failwith "validate_arglist"
   in match xs with
      | Cons { car=parms; cdr=body } ->
-        try
-          let parms = validate_arglist parms
-          in match SList.to_list body with
-             | (body, Nil) ->
-                Success (Function { parms=parms; body=body })
-             | _ -> Error "malformed lambda body"
-        with Failure _ -> Error "malformed lambda expression"
-     | _ -> Error "malformed lambda expression"
+        begin
+          try
+            let parms = validate_arglist parms
+            in match SList.to_list body with
+               | (body, Nil) ->
+                  Success (Function { parms=parms; body=body })
+               | _ -> Error "malformed lambda body"
+          with Failure _ -> Error "malformed lambda expression"
+        end
+   | _ -> Error "malformed lambda expression"
 
-let built_ins = [("LAMBDA", def_lambda)]
+(* (quote x) *)
+let def_quote env xs =
+  match SList.to_list xs with
+  | ([x], Nil) -> Success x
+  | _ -> Error "malformed quote expression"
+
+let built_ins : (string * Sxp.t Env.builtin) list =
+  [("LAMBDA", def_lambda);
+   ("QUOTE", def_quote)]
 
 let built_in_map =
   let f acc kv = match kv with | (k, v) -> LocalMap.add k v acc
